@@ -1,0 +1,1 @@
+exec(compile(open('/home/dawid/Desktop/blender_python/test.py').read(), '/home/dawid/Desktop/blender_python/test.py', 'exec'))
