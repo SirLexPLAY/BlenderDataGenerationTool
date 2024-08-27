@@ -3,6 +3,14 @@
 import random
 import bpy
 import mathutils
+from enum import Enum
+
+
+class OverlapResult(Enum):
+    COMPLETE_OVERLAP = 1
+    PARTIAL_OVERLAP = 0
+    NO_OVERLAP = -1
+
 
 def generate_random_height(mean, std):
     """
@@ -28,6 +36,7 @@ def generate_random_height(mean, std):
         raise TypeError("std must be a float or int.")
     
     return mean + random.uniform(-std, std)
+
 
 def get_aabb(obj):
     """
@@ -62,3 +71,51 @@ def get_aabb(obj):
                                    max(corner.z for corner in world_bbox_corners)))
     
     return min_corner, max_corner
+
+
+def are_aabbs_overlapping(aabb_1, aabb_2):
+    """
+    Checks if two Axis-Aligned Bounding Boxes (AABBs) are overlapping.
+
+    Parameters:
+        aabb_1 (tuple): A pair of min_corner (mathutils.Vector) and max_corner (mathutils.Vector) for the first AABB.
+        aabb_2 (tuple): A pair of min_corner (mathutils.Vector) and max_corner (mathutils.Vector) for the second AABB.
+    
+    Returns:
+        OverlapResult: The overlap status:
+            - OverlapResult.COMPLETE_OVERLAP: One AABB is completely within the other
+            - OverlapResult.PARTIAL_OVERLAP: The AABBs partly overlap
+            - OverlapResult.NO_OVERLAP: No overlap
+
+    Example:
+        >>> aabb_1 = (mathutils.Vector((0, 0, 0)), mathutils.Vector((1, 1, 1)))
+        >>> aabb_2 = (mathutils.Vector((0.5, 0.5, 0.5)), mathutils.Vector((1.5, 1.5, 1.5)))
+        >>> are_aabbs_overlapping(aabb_1, aabb_2)
+        OverlapResult.PARTIAL_OVERLAP
+    
+    Notes:
+        - For both cases of complete and no overlap, inclusive inequalities are
+          used (>= and <=), as for all cases faces are allowed to touch each other.
+    """
+    o1_min = aabb_1[0]
+    o1_max = aabb_1[1]
+    o2_min = aabb_2[0]
+    o2_max = aabb_2[1]
+
+    # In case of complete overlap
+    is_o1_contained_in_o2 = (all(a_coord >= b_coord for a_coord, b_coord in zip(o1_min, o2_min)) and
+                          all(a_coord <= b_coord for a_coord, b_coord in zip(o1_max, o2_max)))
+    is_o2_contained_in_o1 = (all(a_coord >= b_coord for a_coord, b_coord in zip(o2_min, o1_min)) and
+                          all(a_coord <= b_coord for a_coord, b_coord in zip(o2_max, o1_max)))
+    
+    if (is_o1_contained_in_o2 or is_o2_contained_in_o1): 
+        return OverlapResult.COMPLETE_OVERLAP
+
+    # In case of no overlap
+    if (o1_max.x <= o2_min.x or o1_min.x >= o2_max.x or
+        o1_max.y <= o2_min.y or o1_min.y >= o2_max.y or
+        o1_max.z <= o2_min.z or o1_min.z >= o2_max.z): 
+        return OverlapResult.NO_OVERLAP
+    
+    # Otherwise there is partial overlap
+    return OverlapResult.PARTIAL_OVERLAP
