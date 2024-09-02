@@ -2,14 +2,33 @@
 
 import random
 import bpy
-import mathutils
+from mathutils import Vector
 from enum import Enum
-
+from scene_generator_params import SceneGeneratorParams
 
 class OverlapResult(Enum):
     COMPLETE_OVERLAP = 1
     PARTIAL_OVERLAP = 0
     NO_OVERLAP = -1
+
+
+def clean_scene():
+    objects_to_delete = [obj for obj in bpy.context.scene.objects if obj.type not in {'CAMERA', 'LAMP'}]
+    bpy.ops.object.select_all(action='DESELECT')
+
+    for obj in objects_to_delete:
+        obj.select = True
+    bpy.ops.object.delete()
+
+
+def generate_scene(scene_params: SceneGeneratorParams):
+    # scene_params.scene_size
+    # scene_params.objects_to_generate
+    # scene_params.object_count_range
+    # scene_params.object_size_range
+    # scene_params.object_height_distribution
+    # scene_params.allow_overlap
+    return
 
 
 def generate_random_height(mean, std):
@@ -57,16 +76,16 @@ def get_aabb(obj):
     bpy.context.scene.update()
 
     # Retrieve the bounding box corners in the object's local space
-    local_bbox_corners = [mathutils.Vector(corner) for corner in obj.bound_box]
+    local_bbox_corners = [Vector(corner) for corner in obj.bound_box]
 
     # Transform the local coordinates to world coordinates using the object's matrix_world
     world_bbox_corners = [obj.matrix_world @ corner for corner in local_bbox_corners]
 
     # Determine the minimum and maximum coordinates for the AABB in world space
-    min_corner = mathutils.Vector((min(corner.x for corner in world_bbox_corners),
+    min_corner = Vector((min(corner.x for corner in world_bbox_corners),
                                    min(corner.y for corner in world_bbox_corners),
                                    min(corner.z for corner in world_bbox_corners)))
-    max_corner = mathutils.Vector((max(corner.x for corner in world_bbox_corners),
+    max_corner = Vector((max(corner.x for corner in world_bbox_corners),
                                    max(corner.y for corner in world_bbox_corners),
                                    max(corner.z for corner in world_bbox_corners)))
     
