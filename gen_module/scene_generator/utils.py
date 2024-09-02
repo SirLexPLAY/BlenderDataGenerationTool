@@ -4,7 +4,8 @@ import random
 import bpy
 from mathutils import Vector
 from enum import Enum
-from scene_generator_params import SceneGeneratorParams
+from scene_generator_params import SceneGeneratorParams, PrimitiveObjects
+
 
 class OverlapResult(Enum):
     COMPLETE_OVERLAP = 1
@@ -13,6 +14,10 @@ class OverlapResult(Enum):
 
 
 def clean_scene():
+    """
+    Removes all 3D objects.
+    """
+
     objects_to_delete = [obj for obj in bpy.context.scene.objects if obj.type not in {'CAMERA', 'LAMP'}]
     bpy.ops.object.select_all(action='DESELECT')
 
@@ -28,6 +33,11 @@ def generate_scene(scene_params: SceneGeneratorParams):
     # scene_params.object_size_range
     # scene_params.object_height_distribution
     # scene_params.allow_overlap
+
+    # bpy.ops.mesh.primitive_cube_add(...)
+    # bpy.ops.mesh.primitive_cylinder_add(...)
+    # bpy.ops.mesh.primitive_cone_add(...)
+
     return
 
 
