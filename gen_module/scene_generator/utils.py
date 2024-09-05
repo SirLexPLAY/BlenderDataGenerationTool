@@ -93,6 +93,9 @@ def generate_scene(scene_params: SceneGeneratorParams):
                 location=location
             )
 
+        if scene_params.allow_overlap: 
+            continue
+
         obj = bpy.context.object
         obj_aabb = get_aabb(obj)
         if is_aabb_overlapping_with_any_aabb(obj_aabb, aabbs):
