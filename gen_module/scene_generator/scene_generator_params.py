@@ -15,7 +15,7 @@ class SceneGeneratorParams:
             object_count_range: Tuple[int, int],
             object_size_range: Tuple[float, float],
             object_height_distribution: Tuple[float, float],
-            allow_overlap: bool,
+            allow_overlap: bool
     ):
         self._scene_size = scene_size
         self._objects_to_generate = objects_to_generate
