@@ -1,4 +1,11 @@
 {
     "vertices_for_round_objects": 32,
-    "maximum_attempts": 3
+    "maximum_attempts": 3,
+    "primitive_objects": {
+        "BOX": "box",
+        "CONE": "cone",
+        "TRIANGULAR_PYRAMID": "triangular_pyramid",
+        "RECTANGULAR_PYRAMID": "rectangular_pyramid",
+        "CYLINDER": "cylinder"
+    }
 }
