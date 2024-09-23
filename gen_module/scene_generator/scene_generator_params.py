@@ -1,12 +1,9 @@
-from typing import Tuple, Set, Union
+from typing import Tuple, Set
 from enum import Enum
+from system_parameters import SystemConfiguration
 
-class PrimitiveObjects(Enum):
-    BOX = "box"
-    CONE = "cone"
-    TRIANGULAR_PYRAMID = "triangular_pyramid"
-    RECTANGULAR_PYRAMID = "rectangular_pyramid"
-    CYLINDER = "cylinder"
+config = SystemConfiguration()
+PrimitiveObjects = Enum('PrimitiveObjects', config.get("primitive_objects"))
 
 
 class SceneGeneratorParams:
@@ -18,7 +15,7 @@ class SceneGeneratorParams:
             object_count_range: Tuple[int, int],
             object_size_range: Tuple[float, float],
             object_height_distribution: Tuple[float, float],
-            allow_overlap: bool
+            allow_overlap: bool,
     ):
         self._scene_size = scene_size
         self._objects_to_generate = objects_to_generate
