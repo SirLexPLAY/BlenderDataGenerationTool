@@ -27,8 +27,25 @@ Number of all parameters: 12, among them
 
 - Main File
   - Runtime Module
+    - utils
+    - tests
   - Scene Gen Module
+    - utils
+    - tests
   - Scan Module
+    - utils
+    - tests
+
+```mermaid
+  graph TD;
+      A["My Module (main)"]-->B["Runtime Module (main)"];
+      A-->C["Scene Generator Module (main)"];
+      A-->D["Scanner Module (main)"];
+
+      B --> E("Utils");
+      C --> F("Utils");
+      D --> G("Utils");
+```
 
 ## Modules
 
