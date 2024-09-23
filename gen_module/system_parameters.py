@@ -1,7 +1,9 @@
 import json
+import os
 
 class SystemConfiguration:
     _instance = None
+
 
     def __new__(cls):
         if cls._instance is None:
@@ -9,9 +11,16 @@ class SystemConfiguration:
             cls._instance._read_config()
         return cls._instance
 
+
     def _read_config(self):
-        with open("system_parameters.json") as file:
-            self.config = json.load(file)
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        json_file_path = os.path.join(script_dir, "system_parameters.json")
+        try:
+            with open(json_file_path, 'r') as file:
+                self.config = json.load(file)
+        except FileNotFoundError as e:
+            print(f"Error: {e}")
+            self.config = {}
             
     
     def get(self, key, default=None):
