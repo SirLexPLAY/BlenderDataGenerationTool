@@ -4,10 +4,6 @@ import random
 import bpy
 from mathutils import Vector
 from enum import Enum
-from scene_generator_params import SceneGeneratorParams, PrimitiveObjects
-
-
-NUMBER_OF_VERTICES = 32  # used by primitive_cylinder_add and primitive_cone_add
 
 
 class OverlapResult(Enum):
@@ -27,83 +23,6 @@ def clean_scene():
     for obj in objects_to_delete:
         obj.select = True
     bpy.ops.object.delete()
-
-
-def generate_scene(scene_params: SceneGeneratorParams):
-    # scene_params.scene_size
-    # scene_params.objects_to_generate
-    # scene_params.object_count_range
-    # scene_params.object_size_range
-    # scene_params.object_height_distribution
-    # scene_params.allow_overlap
-
-    # bpy.ops.mesh.primitive_cube_add(...)
-    # bpy.ops.mesh.primitive_cylinder_add(...)
-    # bpy.ops.mesh.primitive_cone_add(...)
-
-    number_of_objs = random.randint(*scene_params.object_count_range)
-    objects = [random.choice(list(scene_params.objects_to_generate)) for _ in range(number_of_objs)]
-
-    aabbs = []
-
-    for obj in objects:
-        a,b = scene_params.object_size_range
-        location = [
-            random.random()*scene_params.scene_size - scene_params.scene_size/2,  # x
-            random.random()*scene_params.scene_size - scene_params.scene_size/2,  # y
-            generate_random_height(*scene_params.object_height_distribution)      # z
-        ]
-        
-        if obj.value == PrimitiveObjects.BOX.value:
-            size = [random.random()*(b-a)+a for _ in range(3)]
-
-            bpy.ops.mesh.primitive_cube_add(location=location)
-            box = bpy.context.object
-            box.scale[0] = size[0] / 2.0
-            box.scale[1] = size[2] / 2.0
-            box.scale[2] = size[1] / 2.0
-            
-        elif obj.value == PrimitiveObjects.CYLINDER.value:
-            radius = (random.random()*(b-a)+a)/2
-            depth = random.random()*(b-a)+a
-
-            bpy.ops.mesh.primitive_cylinder_add(
-                radius=radius,
-                depth=depth,
-                vertices=NUMBER_OF_VERTICES,
-                location=location
-            )
-
-        else:
-            vertices = 0
-            if obj.value == PrimitiveObjects.CONE.value:
-                vertices = NUMBER_OF_VERTICES
-            elif obj.value == PrimitiveObjects.TRIANGULAR_PYRAMID.value:
-                vertices = 3
-            elif obj.value == PrimitiveObjects.RECTANGULAR_PYRAMID.value:
-                vertices = 4
-
-            radius = (random.random()*(b-a)+a)/2
-            depth = random.random()*(b-a)+a
-
-            bpy.ops.mesh.primitive_cone_add(
-                radius1=radius,
-                depth=depth,
-                vertices=vertices,
-                location=location
-            )
-
-        if scene_params.allow_overlap: 
-            continue
-
-        obj = bpy.context.object
-        obj_aabb = get_aabb(obj)
-        if is_aabb_overlapping_with_any_aabb(obj_aabb, aabbs):
-            obj.select = True
-            bpy.ops.object.delete()
-        else:
-            aabbs.append(get_aabb(obj))
-
 
 
 def generate_random_height(mean, std):
@@ -225,3 +144,36 @@ def is_aabb_overlapping_with_any_aabb(in_aabb, drawn_aabbs):
         if result.value == OverlapResult.PARTIAL_OVERLAP.value or result.value == OverlapResult.COMPLETE_OVERLAP.value:
             return True
     return False
+
+
+def create_box(a, b, location):
+        size = [random.random()*(b-a)+a for _ in range(3)]
+        bpy.ops.mesh.primitive_cube_add(location=location)
+        box = bpy.context.object
+        box.scale[0] = size[0] / 2.0
+        box.scale[1] = size[2] / 2.0
+        box.scale[2] = size[1] / 2.0
+
+
+def create_cylinder(a, b, location, vertices):
+    radius = (random.random()*(b-a)+a)/2
+    depth = random.random()*(b-a)+a
+
+    bpy.ops.mesh.primitive_cylinder_add(
+        radius=radius,
+        depth=depth,
+        vertices=vertices,
+        location=location
+    )
+
+
+def create_pyramid(a, b, location, vertices):
+    radius = (random.random()*(b-a)+a)/2
+    depth = random.random()*(b-a)+a
+
+    bpy.ops.mesh.primitive_cone_add(
+        radius1=radius,
+        depth=depth,
+        vertices=vertices,
+        location=location
+    )
