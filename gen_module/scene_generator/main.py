@@ -10,13 +10,9 @@ from scene_generator.utils import (generate_random_height,
                    get_aabb)
 
 
-class SceneGenerator():
+class SceneGeneratorModule():
 
     NUMBER_OF_VERTICES = 32  # used by primitive_cylinder_add and primitive_cone_add
-    
-
-    def __init__(self):
-        return
 
 
     def generate_scene(self, scene_params: SceneGeneratorParams):
@@ -28,9 +24,9 @@ class SceneGenerator():
         for obj in objects:
             a,b = scene_params.object_size_range
             location = [
-                random.random()*scene_params.scene_size - scene_params.scene_size/2,    # x
-                random.random()*scene_params.scene_size - scene_params.scene_size/2,    # y
-                generate_random_height(*scene_params.object_height_distribution)  # z
+                random.random()*scene_params.scene_size - scene_params.scene_size/2,  # x
+                random.random()*scene_params.scene_size - scene_params.scene_size/2,  # y
+                generate_random_height(*scene_params.object_height_distribution)      # z
             ]
 
             if obj.value == PrimitiveObjects.BOX.value:
@@ -61,4 +57,15 @@ class SceneGenerator():
                 aabbs.append(obj_aabb)
     
 
+    def clean_scene(self):
+        """
+        Removes all 3D objects.
+        """
+
+        objects_to_delete = [obj for obj in bpy.context.scene.objects if obj.type not in {'CAMERA', 'LAMP'}]
+        bpy.ops.object.select_all(action='DESELECT')
+
+        for obj in objects_to_delete:
+            obj.select = True
+        bpy.ops.object.delete()
     
