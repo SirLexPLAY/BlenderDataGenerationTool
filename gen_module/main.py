@@ -22,18 +22,17 @@ scene_generator_path = os.path.join(project_root, 'scene_generator')
 sys.path.append(scene_generator_path)
 
 
-from runtime import main as runtime_main
 from scanner import main as scanner_main
+from scanner.scanner_params import ScannerParams
 from scene_generator import main as scene_generator_main
 from scene_generator.scene_generator_params import SceneGeneratorParams, PrimitiveObjects
 
 def main():
-    # read system parameters
-    print("this works!")
+    scene_size = 10
 
-    sg = scene_generator_main.SceneGenerator()
+    sg = scene_generator_main.SceneGeneratorModule()
     sg_params = SceneGeneratorParams(
-        scene_size=10,
+        scene_size=scene_size,
         objects_to_generate={
             PrimitiveObjects.BOX,
             PrimitiveObjects.CONE,
@@ -43,14 +42,26 @@ def main():
         },
         object_count_range=(5,8),
         object_size_range=(2.0,4.0),
-        object_height_distribution=(5, 2),
+        object_height_distribution=(0, 2),
         allow_overlap=True
     )
 
-
+    sg.clean_scene()
     sg.generate_scene(sg_params)
 
+    scanner = bpy.data.objects["Camera"]
 
+    sc = scanner_main.ScannerModule()
+    sc_params = ScannerParams(
+        scanner_object=scanner,
+        scene_size=scene_size,
+        frame_start=0,
+        frame_end=100,
+        min_angle=0,
+        max_angle=180,
+        add_noisy_blender_mesh=True
+    )
+    sc.scan_scene(sc_params)
 
     # sys.exit(0)
 
