@@ -1,3 +1,5 @@
+# scene_generator/scene_generator_params.py
+
 from typing import Tuple, Set
 from enum import Enum
 from system_parameters import SystemConfiguration
@@ -27,6 +29,10 @@ class SceneGeneratorParams:
 
     @property
     def scene_size(self):
+        """
+        The size is so that given any number s, the lowest and highest numbers for x,y,z,
+        can be -s/2 and s/2 accordingly. This way the scene has side lengths s.
+        """
         return self._scene_size
 
 
