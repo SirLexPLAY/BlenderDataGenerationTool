@@ -12,19 +12,6 @@ class OverlapResult(Enum):
     NO_OVERLAP = -1
 
 
-def clean_scene():
-    """
-    Removes all 3D objects.
-    """
-
-    objects_to_delete = [obj for obj in bpy.context.scene.objects if obj.type not in {'CAMERA', 'LAMP'}]
-    bpy.ops.object.select_all(action='DESELECT')
-
-    for obj in objects_to_delete:
-        obj.select = True
-    bpy.ops.object.delete()
-
-
 def generate_random_height(mean, std):
     """
     Generates a random height based on a specific mean and standard deviation.
