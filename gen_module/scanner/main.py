@@ -6,7 +6,7 @@ from scanner.scanner_params import ScannerParams
 
 class ScannerModule:
 
-    def scan_scene(self, scanner_params: ScannerParams, numer_of_scans: int = 1):
+    def scan_scene(self, scanner_params: ScannerParams, dir: str, filename: str, numer_of_scans: int = 1):
         camera_setup(
             scanner_params.scanner_object, 
             scanner_params.scene_size
@@ -22,6 +22,8 @@ class ScannerModule:
             scanner_params.scanner_object, 
             scanner_params.frame_start, 
             scanner_params.frame_end,
-            add_noisy_blender_mesh=scanner_params.add_noisy_blender_mesh
+            dir,
+            filename,
+            add_noisy_blender_mesh=scanner_params.add_noisy_blender_mesh,
             )
         

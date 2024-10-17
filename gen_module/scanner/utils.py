@@ -33,7 +33,32 @@ def camera_setup(scanner_object: bpy.types.Object, scene_size: float):
     scanner_object.location = location
 
 
-def scan_range(scanner_object, frame_start, frame_end, add_blender_mesh=False, add_noisy_blender_mesh=False):
+"""
+vlp16_parameters = {
+    "angle_resolution": 0.1,  # Page 52
+    "rotation_speed": 5,      # Page 52 # in Hz, equivalent to 300 RPM
+    "max_dist": 100,          # Page could not be found
+    "noise_mu": 0.0,          
+    "noise_sigma": 0.01,
+    "start_angle": 0,
+    "end_angle": 360,
+    "distance_bias_noise_mu": 0,
+    "distance_bias_noise_sigma": 0.014,
+    "reflectivity_distance": 50,
+    "reflectivity_limit": 0.1,
+    "reflectivity_slope": 0.01,
+    "noise_types": [("gaussian", "Gaussian", "Gaussian distribution (mu/simga)"),
+                    ("laplace", "Laplace", "Laplace distribution (sigma=b)")],
+    
+}
+
+
+"models": [(BLENSOR_VELODYNE_HDL64E2, "HDL-64E2", "HDL-64E2"), (BLENSOR_VELODYNE_HDL32E, "HDL-32E", "HDL-32E"),
+               (BLENSOR_VELODYNE_VLP16, "VLP-16", "VLP-16")]
+"""
+
+
+def scan_range(scanner_object, frame_start, frame_end, dir, file_name, add_blender_mesh=False, add_noisy_blender_mesh=False):
     """
     #TODO: needs to be properly documented
 
@@ -49,7 +74,30 @@ def scan_range(scanner_object, frame_start, frame_end, add_blender_mesh=False, a
         add_blender_mesh=add_blender_mesh,
         add_noisy_blender_mesh=add_noisy_blender_mesh,
         world_transformation=scanner_object.matrix_world,
+
+        angle_resolution=0.1,
+        rotation_speed=5,
+        max_distance=100,
+        noise_mu=0.0,
+        noise_sigma=0.1,
+        depth_map=True,
+        filename=f"{dir}/{file_name}"
     ) 
+    """
+    Other possible parameters:
+    - filename="/tmp/landscape.evd",
+    - frame_time = (1.0/24.0),
+    - rotation_speed = 10.0,
+    - angle_resolution = 0.1728,
+    [-] max_distance = 120.0,
+    [-] noise_mu = 0.0,      
+    [-] noise_sigma= 0.02,
+    - last_frame = True,
+    - output_laser_id_as_color=False,
+    - add_beam_divergence=False,
+    - use_incidence_angle=False,
+    - depth_map=False
+    """
 
 
 def render_image(filepath, fileformat, engine="CYCLES"):
