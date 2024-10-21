@@ -45,17 +45,20 @@ class SceneGeneratorModule():
                     vertices = 4
                 create_pyramid(a, b, location, vertices)
 
-            if scene_params.allow_overlap: 
-                continue
-
             obj = bpy.context.object
             obj_aabb = get_aabb(obj)
+            if scene_params.allow_overlap: 
+                aabbs.append(obj_aabb)
+                continue
+
             if is_aabb_overlapping_with_any_aabb(obj_aabb, aabbs):
                 obj.select = True
                 bpy.ops.object.delete()
             else:
                 aabbs.append(obj_aabb)
+        return aabbs
     
+
 
     def clean_scene(self):
         """

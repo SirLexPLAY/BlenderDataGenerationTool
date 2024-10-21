@@ -6,10 +6,11 @@ from scanner.scanner_params import ScannerParams
 
 class ScannerModule:
 
-    def scan_scene(self, scanner_params: ScannerParams, dir: str, filename: str, numer_of_scans: int = 1):
+    def scan_scene(self, scanner_params: ScannerParams, aabbs, dir: str, filename: str, numer_of_scans: int = 1):
         camera_setup(
             scanner_params.scanner_object, 
-            scanner_params.scene_size
+            scanner_params.scene_size,
+            aabbs
             )
         keyframe_setup(
             scanner_params.scanner_object, 

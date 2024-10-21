@@ -111,7 +111,7 @@ def record(radius=10, frames=250, video_title=f"video.mp4"):
     bpy.ops.render.render(animation=True)
     
 def main():
-    s = 3
+    s = 5
 
     # f = open("/media/dawid/blensor data/run3/test.txt", "w")
 
@@ -150,9 +150,8 @@ def main():
         )
 
         sg.clean_scene()
-        sg.generate_scene(sg_params)
+        aabbs = sg.generate_scene(sg_params)
         bpy.ops.wm.save_as_mainfile(filepath=f"{dir}/scene.blend")
-
 
         record(radius=scene_size*4, frames=100, video_title=f"scene_{n}.mp4")
 
@@ -163,7 +162,7 @@ def main():
         f.write(f"object_height_distribution: (0, {scene_size/2:.3f})\n")
         f.write(f"========================================================\n")
         f.close()
-        continue
+        
         scanner = bpy.data.objects["Camera"]
         sc = scanner_main.ScannerModule()
         sc_params = ScannerParams(
@@ -175,18 +174,9 @@ def main():
             max_angle=180,
             add_noisy_blender_mesh=True
         )
-        sc.scan_scene(sc_params, dir=dir, filename="scan1.numpy")
-        sc.scan_scene(sc_params, dir=dir, filename="scan2.numpy")
-        sc.scan_scene(sc_params, dir=dir, filename="scan3.numpy")
-        bpy.ops.wm.read_factory_settings(use_empty=True)
-        # Explicitly clear all objects except the camera, if required.
-        for obj in bpy.context.scene.objects:
-            if obj.type != 'CAMERA':
-                print(f"objtype: {obj.type}")
-                bpy.data.objects.remove(obj, do_unlink=True)
-        cam = bpy.data.objects.new("Camera", bpy.data.cameras.new("Camera"))
-        bpy.context.scene.objects.link(cam)
-        bpy.context.scene.camera = cam
+        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan1.numpy")
+        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan2.numpy")
+        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan3.numpy")
 
     end_time = time.time()
     print ("Total scan time: %.2f s"%(end_time-start_time))
@@ -197,4 +187,13 @@ if __name__ == "__main__":
 
 
 
-
+# bpy.ops.wm.read_factory_settings(use_empty=True)
+        # Explicitly clear all objects except the camera, if required.
+        # for obj in bpy.context.scene.objects:
+        #     if obj.type != 'CAMERA':
+        #         print(f"objtype: {obj.type}")
+        #         bpy.data.objects.remove(obj, do_unlink=True)
+        # cam = bpy.data.objects.new("Camera", bpy.data.cameras.new("Camera"))
+        # bpy.context.scene.objects.link(cam)
+        # bpy.context.scene.camera = cam
+        # continue

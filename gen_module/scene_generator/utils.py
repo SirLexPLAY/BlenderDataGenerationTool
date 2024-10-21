@@ -138,8 +138,8 @@ def create_box(a, b, location):
         bpy.ops.mesh.primitive_cube_add(location=location)
         box = bpy.context.object
         box.scale[0] = size[0] / 2.0
-        box.scale[1] = size[2] / 2.0
-        box.scale[2] = size[1] / 2.0
+        box.scale[1] = size[1] / 2.0
+        box.scale[2] = size[2] / 2.0
 
 
 def create_cylinder(a, b, location, vertices):
