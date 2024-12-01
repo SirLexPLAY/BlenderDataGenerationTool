@@ -23,15 +23,36 @@ def keyframe_setup(scanner_object, frame_start, frame_end, min_angle, max_angle)
     scanner_object.keyframe_insert(data_path="rotation_euler", frame=frame_end)
 
 
-def camera_setup(scanner_object: bpy.types.Object, scene_size: float):
-    location = [
-                random.random()*scene_size - scene_size/2,  # x
-                random.random()*scene_size - scene_size/2,  # y
-                random.random()*scene_size - scene_size/2   # z
-            ]
+def camera_setup(scanner_object: bpy.types.Object, scene_size: float, aabbs):
     
-    scanner_object.location = location
+    isTrapped = True
+    while isTrapped:
+        location = [
+                    random.random()*scene_size - scene_size/2,  # x
+                    random.random()*scene_size - scene_size/2,  # y
+                    random.random()*scene_size - scene_size/2   # z
+                ]
+        
+        is_inside_any_aabb = False
 
+        for aabb in aabbs:
+            min_aabb = aabb[0]
+            max_aabb = aabb[1]
+
+            # Check if cam location is inside or outside the AABB
+            greater_than_min = min_aabb[0] <= location[0] and min_aabb[1] <= location[1] and min_aabb[2] <= location[2]
+            smaller_than_max = max_aabb[0] >= location[0] and max_aabb[1] >= location[1] and max_aabb[2] >= location[2]
+
+            # The check. If it's inside one object, new location must be picked.
+            # Leave the loop.
+            if greater_than_min and smaller_than_max:
+                is_inside_any_aabb = True
+                break
+
+        # If no test from above was positive, we have found a good camera location.
+        if not is_inside_any_aabb:
+            scanner_object.location = location
+            isTrapped = False
 
 """
 vlp16_parameters = {
@@ -118,3 +139,18 @@ def render_image(filepath, fileformat, engine="CYCLES"):
     bpy.context.scene.render.filepath = filepath
     bpy.context.scene.render.image_settings.file_format = fileformat
     bpy.ops.render.render(write_still=True)
+
+
+def is_camera_trapped(cam_location, aabbs):
+    for aabb in aabbs:
+            min_aabb = aabb[0]
+            max_aabb = aabb[1]
+
+            greater_than_min = min_aabb[0] <= location[0] and min_aabb[1] <= location[1] and min_aabb[2] <= location[2]
+            smaller_than_max = max_aabb[0] >= location[0] and max_aabb[1] >= location[1] and max_aabb[2] >= location[2]
+
+            if greater_than_min and smaller_than_max:
+                continue
+            else:
+                isTrapped = False
+                break
