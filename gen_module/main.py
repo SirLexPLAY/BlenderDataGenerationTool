@@ -105,28 +105,27 @@ def record(radius=10, frames=250, video_title=f"video.mp4"):
 
 
     # Set the output path for rendered frames
-    render.filepath = f"/media/dawid/blensor data/run3/{video_title}"
+    render.filepath = f"/media/dawid/blensor data/testing_pcl/{video_title}"
 
     # Render the animation
     bpy.ops.render.render(animation=True)
     
 def main():
-    s = 5
-
+    s = 10_000
     # f = open("/media/dawid/blensor data/run3/test.txt", "w")
 
     # 1 arg. 0.8[cm]/100[cm/m] = 0.008m (8mm), size of a 1x1 lego brick
     # 2 arg. 1m
     # 3 arg. 10 000 values
     object_sizes = np.linspace(0.8/100, 1, s)
+    #bpy.ops.wm.read_factory_settings(use_empty=True)
 
     start_time = time.time()
-    for n in range(s):
-        f = open(f"/media/dawid/blensor data/run3/test_{n}.txt", "w+")
+    for n in range(8000, 8010):
+        f = open(f"/media/dawid/blensor data/testing_pcl/test_{n}.txt", "w+")
         dirname = f"scanning{n}"
-        dir = f"/media/dawid/blensor data/run3/{dirname}"
-        os.makedirs(f"/media/dawid/blensor data/run3/{dirname}")
-
+        dir = f"/media/dawid/blensor data/testing_pcl/{dirname}"
+        os.makedirs(f"/media/dawid/blensor data/testing_pcl/{dirname}")
         obj_size = object_sizes[n]
         scene_size = obj_size*2.5
         ds = obj_size*0.5
@@ -151,11 +150,16 @@ def main():
 
         sg.clean_scene()
         aabbs = sg.generate_scene(sg_params)
+        
+        #cam = bpy.data.objects.new("Camera", bpy.data.cameras.new("Camera"))
+        #bpy.context.scene.objects.link(cam)
+        #bpy.context.scene.camera = cam
+
         bpy.ops.wm.save_as_mainfile(filepath=f"{dir}/scene.blend")
+        #if n % 100 == 0:
+        #    record(radius=scene_size*4, frames=100, video_title=f"scene_{n}.mp4")
 
-        record(radius=scene_size*4, frames=100, video_title=f"scene_{n}.mp4")
-
-        f.write(f"Scene: {n}\n")
+        f.write(f"Sc        ene: {n} at {time.time()-start_time:.2f}s\n")
         f.write(f"scene_size: {scene_size:.3f}\n")
         f.write(f"object_count_range: (5, 8)\n")
         f.write(f"object_size_range: ({min_size:.3f}, {max_size:.3f})\n")
@@ -169,18 +173,19 @@ def main():
             scanner_object=scanner,
             scene_size=scene_size,
             frame_start=0,
-            frame_end=100,
+            frame_end=200,
             min_angle=0,
             max_angle=180,
             add_noisy_blender_mesh=True
         )
-        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan1.numpy")
-        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan2.numpy")
-        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan3.numpy")
+        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan1.pcd")
+        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan2.pcd")
+        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan3.pcd")
+
 
     end_time = time.time()
-    print ("Total scan time: %.2f s"%(end_time-start_time))
-    # sys.exit(0)
+    print("Total scan time: %.2f s"%(end_time-start_time))
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()
@@ -188,12 +193,11 @@ if __name__ == "__main__":
 
 
 # bpy.ops.wm.read_factory_settings(use_empty=True)
-        # Explicitly clear all objects except the camera, if required.
-        # for obj in bpy.context.scene.objects:
-        #     if obj.type != 'CAMERA':
-        #         print(f"objtype: {obj.type}")
-        #         bpy.data.objects.remove(obj, do_unlink=True)
-        # cam = bpy.data.objects.new("Camera", bpy.data.cameras.new("Camera"))
-        # bpy.context.scene.objects.link(cam)
-        # bpy.context.scene.camera = cam
-        # continue
+# # Explicitly clear all objects except the camera, if required.
+# for obj in bpy.context.scene.objects:
+#     if obj.type != 'CAMERA':
+#         print(f"objtype: {obj.type}")
+#         bpy.data.objects.remove(obj, do_unlink=True)
+# cam = bpy.data.objects.new("Camera", bpy.data.cameras.new("Camera"))
+# bpy.context.scene.objects.link(cam)
+# bpy.context.scene.camera = cam
