@@ -65,10 +65,13 @@ class SceneGeneratorModule():
         Removes all 3D objects.
         """
 
-        objects_to_delete = [obj for obj in bpy.context.scene.objects if obj.type not in {'CAMERA', 'LAMP'}]
-        bpy.ops.object.select_all(action='DESELECT')
+        # objects_to_delete = [obj for obj in bpy.context.scene.objects if obj.type not in {'CAMERA', 'LAMP'}]
+        # bpy.ops.object.select_all(action='DESELECT')
 
-        for obj in objects_to_delete:
-            obj.select = True
-        bpy.ops.object.delete()
+        # for obj in objects_to_delete:
+        #     obj.select = True
+        # bpy.ops.object.delete()
+        for obj in bpy.context.scene.objects:
+            if obj.type == 'MESH':
+                bpy.data.objects.remove(obj, do_unlink=True)
     
