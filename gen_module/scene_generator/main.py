@@ -1,6 +1,7 @@
 # scene_generator/main.py
 import bpy
 import random
+import math
 from scene_generator_params import SceneGeneratorParams, PrimitiveObjects
 from scene_generator.utils import (generate_random_height,
                    create_box,
@@ -29,11 +30,13 @@ class SceneGeneratorModule():
                 generate_random_height(*scene_params.object_height_distribution)      # z
             ]
 
+            rotation = [random.random()*math.pi*2 for _ in range(3)]
+
             if obj.value == PrimitiveObjects.BOX.value:
-                create_box(a, b, location)
+                create_box(a, b, location, rotation)
                 
             elif obj.value == PrimitiveObjects.CYLINDER.value:
-                create_cylinder(a, b, location, self.NUMBER_OF_VERTICES)
+                create_cylinder(a, b, location, rotation, self.NUMBER_OF_VERTICES)
 
             else:
                 vertices = 0
@@ -43,7 +46,7 @@ class SceneGeneratorModule():
                     vertices = 3
                 elif obj.value == PrimitiveObjects.RECTANGULAR_PYRAMID.value:
                     vertices = 4
-                create_pyramid(a, b, location, vertices)
+                create_pyramid(a, b, location, rotation, vertices)
 
             obj = bpy.context.object
             obj_aabb = get_aabb(obj)
