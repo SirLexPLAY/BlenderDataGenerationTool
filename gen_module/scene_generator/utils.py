@@ -133,16 +133,19 @@ def is_aabb_overlapping_with_any_aabb(in_aabb, drawn_aabbs):
     return False
 
 
-def create_box(a, b, location):
+def create_box(a, b, location, rotation):
         size = [random.random()*(b-a)+a for _ in range(3)]
-        bpy.ops.mesh.primitive_cube_add(location=location)
+        bpy.ops.mesh.primitive_cube_add(
+            location=location,
+            rotation=rotation
+        )
         box = bpy.context.object
         box.scale[0] = size[0] / 2.0
         box.scale[1] = size[1] / 2.0
         box.scale[2] = size[2] / 2.0
 
 
-def create_cylinder(a, b, location, vertices):
+def create_cylinder(a, b, location, rotation, vertices):
     radius = (random.random()*(b-a)+a)/2
     depth = random.random()*(b-a)+a
 
@@ -150,11 +153,12 @@ def create_cylinder(a, b, location, vertices):
         radius=radius,
         depth=depth,
         vertices=vertices,
-        location=location
+        location=location,
+        rotation=rotation
     )
 
 
-def create_pyramid(a, b, location, vertices):
+def create_pyramid(a, b, location, rotation, vertices):
     radius = (random.random()*(b-a)+a)/2
     depth = random.random()*(b-a)+a
 
@@ -162,5 +166,6 @@ def create_pyramid(a, b, location, vertices):
         radius1=radius,
         depth=depth,
         vertices=vertices,
-        location=location
+        location=location,
+        rotation=rotation
     )
