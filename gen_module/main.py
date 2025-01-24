@@ -7,6 +7,7 @@ import numpy as np
 import math
 import mathutils
 import time
+import random
 
 # Get the directory of the script
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -105,12 +106,14 @@ def record(radius=10, frames=250, video_title=f"video.mp4"):
 
 
     # Set the output path for rendered frames
-    render.filepath = f"/media/dawid/blensor data/testing_pcl/{video_title}"
+    render.filepath = f"/media/dawid/blensor data/jan2025/{video_title}"
 
     # Render the animation
     bpy.ops.render.render(animation=True)
     
 def main():
+    random.seed(2025)
+
     s = 10_000
     # f = open("/media/dawid/blensor data/run3/test.txt", "w")
 
@@ -121,11 +124,11 @@ def main():
     #bpy.ops.wm.read_factory_settings(use_empty=True)
 
     start_time = time.time()
-    for n in range(8000, 8010):
-        f = open(f"/media/dawid/blensor data/testing_pcl/test_{n}.txt", "w+")
+    for n in range(5506, s):
+        f = open(f"/media/dawid/blensor data/jan2025/test_{n}.txt", "w+")
         dirname = f"scanning{n}"
-        dir = f"/media/dawid/blensor data/testing_pcl/{dirname}"
-        os.makedirs(f"/media/dawid/blensor data/testing_pcl/{dirname}")
+        dir = f"/media/dawid/blensor data/jan2025/{dirname}"
+        os.makedirs(f"/media/dawid/blensor data/jan2025/{dirname}")
         obj_size = object_sizes[n]
         scene_size = obj_size*2.5
         ds = obj_size*0.5
@@ -156,10 +159,10 @@ def main():
         #bpy.context.scene.camera = cam
 
         bpy.ops.wm.save_as_mainfile(filepath=f"{dir}/scene.blend")
-        #if n % 100 == 0:
-        #    record(radius=scene_size*4, frames=100, video_title=f"scene_{n}.mp4")
+        if n % 100 == 0:
+            record(radius=scene_size*4, frames=100, video_title=f"scene_{n}.mp4")
 
-        f.write(f"Sc        ene: {n} at {time.time()-start_time:.2f}s\n")
+        f.write(f"Scene: {n} at {time.time()-start_time:.2f}s\n")
         f.write(f"scene_size: {scene_size:.3f}\n")
         f.write(f"object_count_range: (5, 8)\n")
         f.write(f"object_size_range: ({min_size:.3f}, {max_size:.3f})\n")
