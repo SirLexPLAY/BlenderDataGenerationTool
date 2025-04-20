@@ -133,19 +133,32 @@ def is_aabb_overlapping_with_any_aabb(in_aabb, drawn_aabbs):
     return False
 
 
-def create_box(a, b, location, rotation):
-        size = [random.random()*(b-a)+a for _ in range(3)]
-        bpy.ops.mesh.primitive_cube_add(
-            location=location,
-            rotation=rotation
-        )
-        box = bpy.context.object
-        box.scale[0] = size[0] / 2.0
-        box.scale[1] = size[1] / 2.0
-        box.scale[2] = size[2] / 2.0
+def create_random_plane(a, b, location, rotation):
+    radius = (random.random()*(b-a)+a)/2
+    bpy.ops.mesh.primitive_plane_add(
+        size=radius,
+        location=location,
+        rotation=rotation
+    )
+
+    return radius
 
 
-def create_cylinder(a, b, location, rotation, vertices):
+def create_random_box(a, b, location, rotation):
+    size = [random.random()*(b-a)+a for _ in range(3)]
+    bpy.ops.mesh.primitive_cube_add(
+        location=location,
+        rotation=rotation
+    )
+    box = bpy.context.object
+    box.scale[0] = size[0] / 2.0
+    box.scale[1] = size[1] / 2.0
+    box.scale[2] = size[2] / 2.0
+
+    return size
+
+
+def create_random_cylinder(a, b, location, rotation, vertices):
     radius = (random.random()*(b-a)+a)/2
     depth = random.random()*(b-a)+a
 
@@ -157,8 +170,10 @@ def create_cylinder(a, b, location, rotation, vertices):
         rotation=rotation
     )
 
+    return radius, depth
 
-def create_pyramid(a, b, location, rotation, vertices):
+
+def create_random_pyramid(a, b, location, rotation, vertices):
     radius = (random.random()*(b-a)+a)/2
     depth = random.random()*(b-a)+a
 
@@ -169,3 +184,5 @@ def create_pyramid(a, b, location, rotation, vertices):
         location=location,
         rotation=rotation
     )
+
+    return radius, depth
