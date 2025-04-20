@@ -136,7 +136,7 @@ def is_aabb_overlapping_with_any_aabb(in_aabb, drawn_aabbs):
 def create_random_plane(a, b, location, rotation):
     radius = (random.random()*(b-a)+a)/2
     bpy.ops.mesh.primitive_plane_add(
-        size=radius,
+        radius=radius,
         location=location,
         rotation=rotation
     )
