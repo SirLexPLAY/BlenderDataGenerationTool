@@ -3,12 +3,14 @@ import bpy
 import random
 import math
 from scene_generator_params import SceneGeneratorParams, PrimitiveObjects
-from scene_generator.utils import (generate_random_height,
-                   create_box,
-                   create_cylinder,
-                   create_pyramid,
-                   is_aabb_overlapping_with_any_aabb,
-                   get_aabb)
+from scene_generator.utils import (
+    generate_random_height,
+    create_random_plane, 
+    create_random_box,
+    create_random_cylinder,
+    create_random_pyramid,
+    is_aabb_overlapping_with_any_aabb,
+    get_aabb)
 
 
 class SceneGeneratorModule():
@@ -19,6 +21,7 @@ class SceneGeneratorModule():
     def generate_scene(self, scene_params: SceneGeneratorParams):
         number_of_objs = random.randint(*scene_params.object_count_range)
         objects = [random.choice(list(scene_params.objects_to_generate)) for _ in range(number_of_objs)]
+        object_params = []
 
         aabbs = []
 
@@ -32,11 +35,33 @@ class SceneGeneratorModule():
 
             rotation = [random.random()*math.pi*2 for _ in range(3)]
 
+            if obj.value == PrimitiveObjects.PLANE.value:
+                size = create_random_plane(a, b, location, rotation)
+                object_params.append({
+                    "type": "plane",
+                    "location": location,
+                    "rotation": rotation,
+                    "size": size
+                })
+
             if obj.value == PrimitiveObjects.BOX.value:
-                create_box(a, b, location, rotation)
-                
+                size = create_random_box(a, b, location, rotation)
+                object_params.append({
+                    "type": "box",
+                    "location": location,
+                    "rotation": rotation,
+                    "size": size
+                })
+
             elif obj.value == PrimitiveObjects.CYLINDER.value:
-                create_cylinder(a, b, location, rotation, self.NUMBER_OF_VERTICES)
+                radius, depth = create_random_cylinder(a, b, location, rotation, self.NUMBER_OF_VERTICES)
+                object_params.append({
+                    "type": "cylinder",
+                    "location": location,
+                    "rotation": rotation,
+                    "radius": radius,
+                    "depth": depth
+                })
 
             else:
                 vertices = 0
@@ -46,7 +71,15 @@ class SceneGeneratorModule():
                     vertices = 3
                 elif obj.value == PrimitiveObjects.RECTANGULAR_PYRAMID.value:
                     vertices = 4
-                create_pyramid(a, b, location, rotation, vertices)
+                radius, depth = create_random_pyramid(a, b, location, rotation, vertices)
+
+                object_params.append({
+                    "type": "cylinder",
+                    "location": location,
+                    "rotation": rotation,
+                    "radius": radius,
+                    "depth": depth
+                })
 
             obj = bpy.context.object
             obj_aabb = get_aabb(obj)
@@ -59,7 +92,7 @@ class SceneGeneratorModule():
                 bpy.ops.object.delete()
             else:
                 aabbs.append(obj_aabb)
-        return aabbs
+        return aabbs, object_params
     
 
 
