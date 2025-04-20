@@ -158,6 +158,18 @@ def create_random_box(a, b, location, rotation):
     return size
 
 
+def create_random_sphere(a, b, location):
+    size = (random.random()*(b-a)+a)/2
+    bpy.ops.mesh.primitive_uv_sphere_add(
+        segments=64, 
+        ring_count=64, 
+        size=size, 
+        location=location
+    )
+
+    return size
+    
+
 def create_random_cylinder(a, b, location, rotation, vertices):
     radius = (random.random()*(b-a)+a)/2
     depth = random.random()*(b-a)+a
