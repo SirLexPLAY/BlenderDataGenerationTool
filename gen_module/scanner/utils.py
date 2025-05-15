@@ -101,7 +101,7 @@ def scan_range(scanner_object, frame_start, frame_end, dir, file_name, add_blend
         max_distance=100,
         noise_mu=0.0,
         noise_sigma=0.03,
-        depth_map=True,
+        depth_map=False,
         filename=f"{dir}/{file_name}"
     ) 
     """

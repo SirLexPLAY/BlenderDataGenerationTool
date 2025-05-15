@@ -5,8 +5,9 @@ import math
 from scene_generator_params import SceneGeneratorParams, PrimitiveObjects
 from scene_generator.utils import (
     generate_random_height,
-    create_random_plane, 
+    create_random_plane,
     create_random_box,
+    create_random_sphere,
     create_random_cylinder,
     create_random_pyramid,
     is_aabb_overlapping_with_any_aabb,
@@ -34,23 +35,32 @@ class SceneGeneratorModule():
             ]
 
             rotation = [random.random()*math.pi*2 for _ in range(3)]
-
+            print(f"===== OBJECT: {obj} =====")
             if obj.value == PrimitiveObjects.PLANE.value:
-                size = create_random_plane(a, b, location, rotation)
+                radius = create_random_plane(a, b, location, rotation)
                 object_params.append({
                     "type": "plane",
                     "location": location,
                     "rotation": rotation,
-                    "size": size
+                    "radius": radius
                 })
 
-            if obj.value == PrimitiveObjects.BOX.value:
+            elif obj.value == PrimitiveObjects.BOX.value:
                 size = create_random_box(a, b, location, rotation)
                 object_params.append({
                     "type": "box",
                     "location": location,
                     "rotation": rotation,
                     "size": size
+                })
+
+            elif obj.value == PrimitiveObjects.SPHERE.value:
+                size = create_random_sphere(a, b, location)
+                object_params.append({
+                    "type": "sphere",
+                    "location": location,
+                    "rotation": rotation,
+                    "size": size,
                 })
 
             elif obj.value == PrimitiveObjects.CYLINDER.value:
@@ -74,7 +84,7 @@ class SceneGeneratorModule():
                 radius, depth = create_random_pyramid(a, b, location, rotation, vertices)
 
                 object_params.append({
-                    "type": "cylinder",
+                    "type": "pyramid",
                     "location": location,
                     "rotation": rotation,
                     "radius": radius,

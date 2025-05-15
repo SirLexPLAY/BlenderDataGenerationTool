@@ -8,6 +8,7 @@ import math
 import mathutils
 import time
 import random
+import csv
 
 # Get the directory of the script
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -106,12 +107,95 @@ def record(radius=10, frames=250, video_title=f"video.mp4"):
 
 
     # Set the output path for rendered frames
-    render.filepath = f"/media/dawid/blensor data/jan2025/{video_title}"
+    render.filepath = f"/media/dawid/blensor data/jan20252/{video_title}"
 
     # Render the animation
     bpy.ops.render.render(animation=True)
-    
+
+
+def write_params_to_csv(filename, params):
+    """
+    For all objects, some common parameters are type, location and rotation.
+    Cylinder and plane use radius, and sphere uses size. Additionally, cylinders
+    also use depth as height, and need one more column.
+    """
+
+    with open(filename, mode="w+", newline="") as file:
+        header = ["type", "location", "rotation", "radius/size", "depth"]
+        num_cols = len(header)
+
+        writer = csv.writer(file)
+        writer.writerow(header)
+        for row in params:
+            if len(row) < num_cols: # True for planes and spheres
+                row += [""]
+            if len(row) != num_cols:
+                raise ValueError(f"Row length {len(row)} does not match header length {num_cols}")
+            writer.writerow(row)
+
+
 def main():
+    random.seed(2025)
+    a = 0.8/100 # 0.08m  (0.8cm)
+    b = 1       # 1.0m   (100cm)
+    s = 100
+    objs = [PrimitiveObjects.PLANE, PrimitiveObjects.SPHERE, PrimitiveObjects.CYLINDER]
+    dirname = f"/home/dawid/Desktop/generator_params/pointclouds"
+
+    sg = scene_generator_main.SceneGeneratorModule()
+    data = []
+    for obj in objs:
+        for n in range(0, 100):
+            print(f"Generating {obj} {n}")
+            obj_size = a + (b-a)/s*n 
+            scene_size = obj_size*2.5
+            print(f"Objsize: {obj_size:.3f}")
+
+            sg_params = SceneGeneratorParams(
+                scene_size=scene_size,
+                objects_to_generate={obj},
+                object_count_range=(1,1),
+                object_size_range=(obj_size, obj_size),
+                object_height_distribution=(0, scene_size/2),
+                allow_overlap=False
+            )
+            sg.clean_scene()
+            aabbs, object_params = sg.generate_scene(sg_params)             
+            objtype = object_params[0]["type"]
+            location = object_params[0]["location"]
+            rotation = object_params[0]["rotation"]
+            if objtype == "cylinder":
+                print(object_params)
+                radius = object_params[0]["radius"]
+                depth = object_params[0]["depth"]
+                data.append([objtype, location, rotation, radius, depth])
+            elif objtype == "plane":
+                radius = object_params[0]["radius"]
+                data.append([objtype, location, rotation, radius, ""])
+            elif objtype == "sphere":
+                size = object_params[0]["size"]
+                data.append([objtype, location, rotation, size, ""])
+            else:
+                raise ValueError(f"Unknown object type: {objtype}")
+
+            scanner = bpy.data.objects["Camera"]
+            sc = scanner_main.ScannerModule()
+            sc_params = ScannerParams(
+                scanner_object=scanner,
+                scene_size=scene_size,
+                frame_start=0,
+                frame_end=200,
+                min_angle=0,
+                max_angle=180,
+                add_noisy_blender_mesh=True
+            )
+            os.makedirs(f"{dirname}/{objtype}_{n}")
+            sc.scan_scene(sc_params, aabbs, dir=f"{dirname}/{objtype}_{n}", filename=f"{objtype}_{n}.evd")
+
+    write_params_to_csv(f"/home/dawid/Desktop/generator_params/params.csv", data)
+    return
+
+def main2():
     random.seed(2025)
 
     s = 10_000
@@ -124,11 +208,11 @@ def main():
     #bpy.ops.wm.read_factory_settings(use_empty=True)
 
     start_time = time.time()
-    for n in range(5506, s):
-        f = open(f"/media/dawid/blensor data/jan2025/test_{n}.txt", "w+")
+    for n in range(9000, s):
         dirname = f"scanning{n}"
-        dir = f"/media/dawid/blensor data/jan2025/{dirname}"
-        os.makedirs(f"/media/dawid/blensor data/jan2025/{dirname}")
+        dir = f"/media/dawid/blensor data/jan20252/{dirname}"
+        os.makedirs(f"/media/dawid/blensor data/jan20252/{dirname}")
+        f = open(f"/media/dawid/blensor data/jan20252/{dirname}/test_{n}.txt", "w+")
         obj_size = object_sizes[n]
         scene_size = obj_size*2.5
         ds = obj_size*0.5
@@ -141,7 +225,7 @@ def main():
             objects_to_generate={
                 PrimitiveObjects.BOX,
                 PrimitiveObjects.CONE,
-                PrimitiveObjects.TRIANGULAR_PYRAMID,
+               #PrimitiveObjects.TRIANGULAR_PYRAMID,
                 PrimitiveObjects.RECTANGULAR_PYRAMID,
                 PrimitiveObjects.CYLINDER,
             },
@@ -152,7 +236,7 @@ def main():
         )
 
         sg.clean_scene()
-        aabbs = sg.generate_scene(sg_params)
+        aabbs, object_params = sg.generate_scene(sg_params)
         
         #cam = bpy.data.objects.new("Camera", bpy.data.cameras.new("Camera"))
         #bpy.context.scene.objects.link(cam)
@@ -168,6 +252,9 @@ def main():
         f.write(f"object_size_range: ({min_size:.3f}, {max_size:.3f})\n")
         f.write(f"object_height_distribution: (0, {scene_size/2:.3f})\n")
         f.write(f"========================================================\n")
+        f.write(f"Objects generated:\n")
+        for obj in object_params:
+            f.write(str(obj) + "\n")
         f.close()
         
         scanner = bpy.data.objects["Camera"]
@@ -181,9 +268,9 @@ def main():
             max_angle=180,
             add_noisy_blender_mesh=True
         )
-        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan1.pcd")
-        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan2.pcd")
-        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan3.pcd")
+        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan1.evd")
+        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan2.evd")
+        sc.scan_scene(sc_params, aabbs, dir=dir, filename="scan3.evd")
 
 
     end_time = time.time()
