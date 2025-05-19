@@ -13,7 +13,7 @@ allow_overlap: true
 
 ## Scanner Settings
 ```
-scanner_object: scanner
+scanner_object: bpy.data.objects["Camera"]
 scene_size: scene_size
 frame_start: 0
 frame_end: 200
